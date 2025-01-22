@@ -26,7 +26,7 @@ const Login=()=>{
         setError(null);
         setSucces(false);
       try{
-        const response=await fetch("https://enigmatic-shelf-01881-15c9cb2f80b1.herokuapp.com/LogInInventory",{
+        const response=await fetch("https://roboticspointbackend-b6b7b2e85bbf.herokuapp.com/LogInInventory",{
           method:'POST',
           headers:{
             'Content-Type':'application/json',
