@@ -1,10 +1,11 @@
-   import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import './InventoryPage.css';
 
 const InventoryPage = () => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const [searchTerm, setSearchTerm] = useState('');
 
     useEffect(() => {
         // Fetch all products from the backend
@@ -75,6 +76,14 @@ const InventoryPage = () => {
         }
     };
 
+    const handleSearch = (e) => {
+        setSearchTerm(e.target.value);
+    };
+
+    const filteredProducts = products.filter((product) =>
+        product.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
     if (loading) {
         return <div>Loading...</div>;
     }
@@ -86,6 +95,14 @@ const InventoryPage = () => {
     return (
         <div className="inventory-page">
             <h2>Inventory Management</h2>
+            <div className="search-bar">
+                <input
+                    type="text"
+                    placeholder="Search products by name..."
+                    value={searchTerm}
+                    onChange={handleSearch}
+                />
+            </div>
             <table>
                 <thead>
                     <tr>
@@ -97,11 +114,11 @@ const InventoryPage = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {products.map((product) => (
+                    {filteredProducts.map((product) => (
                         <tr key={product._id}>
                             <td>{product.name}</td>
                             <td>{product.availableQuant}</td>
-                            <td>${product.price }</td>
+                            <td>${product.price}</td>
                             <td>
                                 <input
                                     type="number"
