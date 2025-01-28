@@ -101,7 +101,7 @@ const InventoryPage = () => {
                         <tr key={product._id}>
                             <td>{product.name}</td>
                             <td>{product.availableQuant}</td>
-                            <td>${product.price ? product.price.toFixed(2) : '0.00'}</td>
+                            <td>${product.price }</td>
                             <td>
                                 <input
                                     type="number"
