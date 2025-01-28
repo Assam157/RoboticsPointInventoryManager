@@ -1,4 +1,4 @@
- import React, { useState, useEffect } from 'react';
+   import React, { useState, useEffect } from 'react';
 import './InventoryPage.css';
 
 const InventoryPage = () => {
@@ -10,10 +10,13 @@ const InventoryPage = () => {
         // Fetch all products from the backend
         const fetchProducts = async () => {
             try {
-                const response = await fetch('https://roboticspointbackend-b6b7b2e85bbf.herokuapp.com/get_products', {
-                    method: 'GET',
-                    headers: { 'Content-Type': 'application/json' },
-                });
+                const response = await fetch(
+                    'https://roboticspointbackend-b6b7b2e85bbf.herokuapp.com/get_products',
+                    {
+                        method: 'GET',
+                        headers: { 'Content-Type': 'application/json' },
+                    }
+                );
 
                 if (!response.ok) {
                     throw new Error('Failed to load products');
@@ -32,16 +35,25 @@ const InventoryPage = () => {
     }, []);
 
     const handleUpdate = async (productId, newQuantity, newPrice) => {
+        // Avoid unnecessary updates if no changes are made
+        if (isNaN(newQuantity) || isNaN(newPrice)) {
+            alert('Invalid quantity or price');
+            return;
+        }
+
         // Update the stock and price for the product
-        const response = await fetch('https://roboticspointbackend-b6b7b2e85bbf.herokuapp.com/update_product_stock', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                _id: productId,
-                availableQuant: parseInt(newQuantity),
-                price: parseFloat(newPrice),
-            }),
-        });
+        const response = await fetch(
+            'https://roboticspointbackend-b6b7b2e85bbf.herokuapp.com/update_product_stock',
+            {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    _id: productId,
+                    availableQuant: parseInt(newQuantity),
+                    price: parseFloat(newPrice),
+                }),
+            }
+        );
 
         const data = await response.json();
 
@@ -49,7 +61,11 @@ const InventoryPage = () => {
             setProducts((prevProducts) =>
                 prevProducts.map((product) =>
                     product._id === productId
-                        ? { ...product, availableQuant: newQuantity, price: newPrice }
+                        ? {
+                              ...product,
+                              availableQuant: parseInt(newQuantity),
+                              price: parseFloat(newPrice),
+                          }
                         : product
                 )
             );
@@ -85,14 +101,21 @@ const InventoryPage = () => {
                         <tr key={product._id}>
                             <td>{product.name}</td>
                             <td>{product.availableQuant}</td>
-                            <td>${product.price.toFixed(2)}</td>
+                            <td>${product.price ? product.price.toFixed(2) : '0.00'}</td>
                             <td>
                                 <input
                                     type="number"
                                     defaultValue={product.availableQuant}
-                                    onBlur={(e) =>
-                                        handleUpdate(product._id, e.target.value, product.price)
-                                    }
+                                    onBlur={(e) => {
+                                        const newQuantity = e.target.value;
+                                        if (parseInt(newQuantity) !== product.availableQuant) {
+                                            handleUpdate(
+                                                product._id,
+                                                newQuantity,
+                                                product.price
+                                            );
+                                        }
+                                    }}
                                 />
                             </td>
                             <td>
@@ -100,9 +123,16 @@ const InventoryPage = () => {
                                     type="number"
                                     step="0.01"
                                     defaultValue={product.price}
-                                    onBlur={(e) =>
-                                        handleUpdate(product._id, product.availableQuant, e.target.value)
-                                    }
+                                    onBlur={(e) => {
+                                        const newPrice = e.target.value;
+                                        if (parseFloat(newPrice) !== product.price) {
+                                            handleUpdate(
+                                                product._id,
+                                                product.availableQuant,
+                                                newPrice
+                                            );
+                                        }
+                                    }}
                                 />
                             </td>
                         </tr>
