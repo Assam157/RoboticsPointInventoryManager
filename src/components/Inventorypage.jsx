@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+ import React, { useState, useEffect } from 'react';
 import './InventoryPage.css';
 
 const InventoryPage = () => {
@@ -14,12 +14,11 @@ const InventoryPage = () => {
                     method: 'GET',
                     headers: { 'Content-Type': 'application/json' },
                 });
-                
-                // Check if the response is ok (status 200)
+
                 if (!response.ok) {
                     throw new Error('Failed to load products');
                 }
-                
+
                 const data = await response.json();
                 setProducts(data);
                 setLoading(false);
@@ -32,25 +31,31 @@ const InventoryPage = () => {
         fetchProducts();
     }, []);
 
-    const handleStockChange = async (productId, newQuantity) => {
-        // Update the available quantity for the product
+    const handleUpdate = async (productId, newQuantity, newPrice) => {
+        // Update the stock and price for the product
         const response = await fetch('https://roboticspointbackend-b6b7b2e85bbf.herokuapp.com/update_product_stock', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ _id: productId, availableQuant: parseInt(newQuantity) }),
+            body: JSON.stringify({
+                _id: productId,
+                availableQuant: parseInt(newQuantity),
+                price: parseFloat(newPrice),
+            }),
         });
-        
+
         const data = await response.json();
 
         if (data.success) {
             setProducts((prevProducts) =>
                 prevProducts.map((product) =>
-                    product._id === productId ? { ...product, availableQuant: newQuantity } : product
+                    product._id === productId
+                        ? { ...product, availableQuant: newQuantity, price: newPrice }
+                        : product
                 )
             );
-            alert('Stock updated successfully!');
+            alert('Stock and price updated successfully!');
         } else {
-            alert('Error updating stock: ' + data.message);
+            alert('Error updating product: ' + data.message);
         }
     };
 
@@ -70,7 +75,9 @@ const InventoryPage = () => {
                     <tr>
                         <th>Product Name</th>
                         <th>Available Quantity</th>
+                        <th>Price</th>
                         <th>Update Quantity</th>
+                        <th>Update Price</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -78,11 +85,24 @@ const InventoryPage = () => {
                         <tr key={product._id}>
                             <td>{product.name}</td>
                             <td>{product.availableQuant}</td>
+                            <td>${product.price.toFixed(2)}</td>
                             <td>
                                 <input
                                     type="number"
                                     defaultValue={product.availableQuant}
-                                    onBlur={(e) => handleStockChange(product._id, e.target.value)}
+                                    onBlur={(e) =>
+                                        handleUpdate(product._id, e.target.value, product.price)
+                                    }
+                                />
+                            </td>
+                            <td>
+                                <input
+                                    type="number"
+                                    step="0.01"
+                                    defaultValue={product.price}
+                                    onBlur={(e) =>
+                                        handleUpdate(product._id, product.availableQuant, e.target.value)
+                                    }
                                 />
                             </td>
                         </tr>
