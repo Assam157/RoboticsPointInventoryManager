@@ -12,7 +12,7 @@ const InventoryPage = () => {
         const fetchProducts = async () => {
             try {
                 const response = await fetch(
-                    'https://roboticspointbackend-b6b7b2e85bbf.herokuapp.com/get_products',
+                    'https://darkorchid-tapir-476375.hostingersite.com/get_products',
                     {
                         method: 'GET',
                         headers: { 'Content-Type': 'application/json' },
@@ -44,7 +44,7 @@ const InventoryPage = () => {
 
         // Update the stock and price for the product
         const response = await fetch(
-            'https://roboticspointbackend-b6b7b2e85bbf.herokuapp.com/update_product_stock',
+            'https://darkorchid-tapir-476375.hostingersite.com/update_product_stock',
             {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
